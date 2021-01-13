@@ -63,22 +63,19 @@ class Wallet {
  *
  * let person = new Person(name, x, y);
  **********************************************************/
-const point = new Point(4, 3);
-const wallet = new Wallet(0);
+
 
 class Person {
    
-  moveTo= point => {this.location=point};
-   
-  constructor(name,location,wallet){
+  
+  constructor(name,x,y){
    
      this.name=name;
-     this.location=moveTo(location);
-     this.wallet=wallet;
-   
+     this.location=new Point(x,y);
+     this.wallet=new Wallet();
+     
   }
-  
-   
+  moveTo=(point) => this.location=point  ;
 
 
 }
@@ -98,9 +95,25 @@ class Person {
  *
  * new vendor = new Vendor(name, x, y);
  **********************************************************/
-class Vendor {
-  // implement Vendor!
-}
+class Vendor extends Person {
+ /* constructor(name,x,y){ 
+       super(name,x,y);
+         this.range=range;
+        this.price=price;  */
+        range=5;
+        price=1;   
+
+    
+    sellTo = (customer, numberOfIceCreams) =>{ 
+         this.moveTo(customer.location);
+        const cost= this.price * numberOfIceCreams; 
+        customer.wallet.debit(cost);
+        this.wallet.credit(cost);
+    };
+ }
+
+ 
+
 
 /**********************************************************
  * Customer: defines a customer
@@ -118,9 +131,26 @@ class Vendor {
  *
  * new customer = new Customer(name, x, y);
  **********************************************************/
-class Customer {
-  // implement Customer!
-}
+class Customer extends Person{
+  constructor (name,x,y){
+     super(name,x,y);
+     this.wallet.credit(10);
+    
+  }
+  _isInRange = (vendor) => this.location.distanceTo(vendor.location) <= vendor.range;
+
+     _haveEnoughMoney =(vendor,numberOfIceCreams) =>this.wallet.money >= vendor.price*numberOfIceCreams;
+
+     requestIceCream =(vendor,numberOfIceCreams)=>
+     { if(
+       this._isInRange(vendor) && 
+       this._haveEnoughMoney(vendor,numberOfIceCreams)){
+       vendor.sellTo(this,numberOfIceCreams);
+     }
+      };
+
+   }
+
 
 export { Point, Wallet, Person, Customer, Vendor };
 
